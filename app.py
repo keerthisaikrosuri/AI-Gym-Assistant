@@ -389,31 +389,25 @@ else:
     # =====================================================
     # MODULE 5:  Virtual Gym Buddy 
     # =====================================================
-  
 elif current_exec_module == "Module 5":
     st.markdown("<div class='module-strip'><h2>💬 Module 5: Virtual Gym Buddy (AI Chat Companion)</h2></div>", unsafe_allow_html=True)
 
-    # Shared performance score
     score = st.session_state.get("performance_score", 82)
 
-    # Initialize session state safely
     if "chat_history" not in st.session_state:
         st.session_state["chat_history"] = []
 
     if "chat_input" not in st.session_state:
         st.session_state["chat_input"] = ""
 
-    # Input box
     user_msg = st.text_input("Enter message", key="chat_input")
 
     if st.button("Send Chat Message"):
         if user_msg:
 
-            # 1. Sentiment analysis
             analysis = sentiment_engine(user_msg)[0]
             sentiment_label = analysis['label']
 
-            # 2. Response logic
             if sentiment_label == "NEGATIVE" and score < 75:
                 reply = "I noticed your form score is struggling. Don't push for PRs today—let's prioritize mobility."
             elif sentiment_label == "POSITIVE":
@@ -421,14 +415,12 @@ elif current_exec_module == "Module 5":
             else:
                 reply = "Consistency is key. Focus on clean movement patterns."
 
-            # 3. Store user message
             st.session_state["chat_history"].append({
                 "sender": "Athlete",
                 "msg": user_msg,
                 "sentiment": sentiment_label
             })
 
-            # 4. Store AI reply
             st.session_state["chat_history"].append({
                 "sender": "Buddy AI",
                 "msg": reply,
@@ -438,25 +430,9 @@ elif current_exec_module == "Module 5":
             st.session_state["chat_input"] = ""
             st.rerun()
 
-    # Chat display
-    st.markdown("<br>### 💬 Active Conversation History", unsafe_allow_html=True)
-
-    for text_log in reversed(st.session_state["chat_history"]):
-        sentiment_badge = (
-            f" <span style='color:#EF4444; font-size:11px;'>[{text_log['sentiment']}]</span>"
-            if text_log['sentiment'] != "NEUTRAL"
-            else ""
-        )
-
-        bg_card_color = "#EFF6FF" if text_log['sender'] == "Buddy AI" else "#F1F5F9"
-        label_color = "#0284C7" if text_log['sender'] == "Buddy AI" else "#475569"
-
-        st.markdown(f"""
-        <div style='background-color:{bg_card_color}; border:1px solid #E2E8F0; padding:15px; border-radius:8px; margin-bottom:10px;'>
-            <strong style='color:{label_color};'>{text_log['sender']}:</strong> {text_log['msg']}{sentiment_badge}
-        </div>
-        """, unsafe_allow_html=True)
-
+# ❗ ONLY AFTER ALL ELIFs
+else:
+    st.warning("Invalid module selected")
 
     # =====================================================
     # MODULE 6: POSE ANALYZER
