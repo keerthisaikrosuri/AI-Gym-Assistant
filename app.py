@@ -387,54 +387,72 @@ else:
             st.success("✅ AI Coach Advice: Metrics reflect highly robust habit compliance trends. Keep pushing your training goals!")
 
     # =====================================================
-    # MODULE 5: GYM BUDDY
-    # =====================================================
     elif current_exec_module == "Module 5":
-        st.markdown("<div class='module-strip'><h2>💬 Module 5: Virtual Gym Buddy (AI Chat Companion)</h2></div>", unsafe_allow_html=True)
-        
-        # Accessing shared performance data
-        score = st.session_state.get("performance_score", 82)
-        
-        user_msg = st.text_input("How is your training feeling today?", "", key="chat_input")
-        
-        if st.button("Send Chat Message"):
-            if user_msg:
-                # 1. Get sentiment
-                analysis = sentiment_engine(user_msg)[0]
-                sentiment_label = analysis['label']
-                
-                # 2. Logic for reply (keep your logic)
-                if sentiment_label == "NEGATIVE" and score < 75:
-                    reply = "I noticed your form score is struggling. Don't push for PRs today—let's prioritize mobility."
-                elif sentiment_label == "POSITIVE":
-                    reply = "High energy detected! Your score is strong. Let's aim to increase your load by 5% today."
-                else:
-                    reply = "Consistency is key. Focus on clean movement patterns."
-                
-                # 3. Store with consistent keys
-                st.session_state["chat_history"].append({
-                    "sender": "Athlete", 
-                    "msg": user_msg, 
-                    "sentiment": sentiment_label # Add this!
-                })
-                st.session_state["chat_history"].append({
-                    "sender": "Buddy AI", 
-                    "msg": reply, 
-                    "sentiment": "NEUTRAL" # Add this!
-                })
-                st.session_state.chat_input = "" # This clears the box
-                st.rerun()
+    st.markdown("<div class='module-strip'><h2>💬 Module 5: Virtual Gym Buddy (AI Chat Companion)</h2></div>", unsafe_allow_html=True)
 
-        st.markdown("<br>### 💬 Active Conversation History", unsafe_allow_html=True)
-        for text_log in reversed(st.session_state["chat_history"]):
-            sentiment_badge = f" <span style='color:#EF4444; font-size:11px;'>[{text_log['sentiment']}]</span>" if (text_log['sentiment'] != "NEUTRAL" and dev_mode) else ""
-            bg_card_color = "#EFF6FF" if text_log['sender'] == "Buddy AI" else "#F1F5F9"
-            label_color = "#0284C7" if text_log['sender'] == "Buddy AI" else "#475569"
-            st.markdown(f"""
-            <div style='background-color:{bg_card_color}; border:1px solid #E2E8F0; padding:15px; border-radius:8px; margin-bottom:10px;'>
-                <strong style='color:{label_color};'>{text_log['sender']}:</strong> {text_log['msg']}{sentiment_badge}
-            </div>
-            """, unsafe_allow_html=True)
+    # Shared performance score
+    score = st.session_state.get("performance_score", 82)
+
+    # Initialize session state safely
+    if "chat_history" not in st.session_state:
+        st.session_state["chat_history"] = []
+
+    if "chat_input" not in st.session_state:
+        st.session_state["chat_input"] = ""
+
+    # Input box
+    user_msg = st.text_input("Enter message", key="chat_input")
+
+    if st.button("Send Chat Message"):
+        if user_msg:
+
+            # 1. Sentiment analysis
+            analysis = sentiment_engine(user_msg)[0]
+            sentiment_label = analysis['label']
+
+            # 2. Response logic
+            if sentiment_label == "NEGATIVE" and score < 75:
+                reply = "I noticed your form score is struggling. Don't push for PRs today—let's prioritize mobility."
+            elif sentiment_label == "POSITIVE":
+                reply = "High energy detected! Your score is strong. Let's aim to increase your load by 5% today."
+            else:
+                reply = "Consistency is key. Focus on clean movement patterns."
+
+            # 3. Store user message
+            st.session_state["chat_history"].append({
+                "sender": "Athlete",
+                "msg": user_msg,
+                "sentiment": sentiment_label
+            })
+
+            # 4. Store AI reply
+            st.session_state["chat_history"].append({
+                "sender": "Buddy AI",
+                "msg": reply,
+                "sentiment": "NEUTRAL"
+            })
+
+            st.session_state["chat_input"] = ""
+            st.rerun()
+
+    # Chat display
+    st.markdown("<br>### 💬 Active Conversation History", unsafe_allow_html=True)
+
+    for text_log in reversed(st.session_state["chat_history"]):
+        sentiment_badge = (
+            f" <span style='color:#EF4444; font-size:11px;'>[{text_log['sentiment']}]</span>"
+            if text_log['sentiment'] != "NEUTRAL"
+            else ""
+        )
+
+        bg_card_color = "#EFF6FF" if text_log['sender'] == "Buddy AI" else "#F1F5F9"
+        label_color = "#0284C7" if text_log['sender'] == "Buddy AI" else "#475569"
+
+        st.markdown(f"""
+        <div style='background-color:{bg_card_color}; border:1px solid #E2E8F0; padding:15px; border-radius:8px; margin-bottom:10px;'>
+            <strong style='color:{label_color};'>{text_log['sender']}:</strong> {text_log['msg']}{sentiment_badge}
+        </div>
+        """, unsafe_allow_html=True)
 
     # =====================================================
     # MODULE 6: POSE ANALYZER
@@ -464,6 +482,11 @@ else:
     # =====================================================
     # MODULE 7: GYM RECOMMENDER
     # =====================================================
+    
+        # =====================================================
+    # MODULE 7: GYM RECOMMENDER
+    # =====================================================
+    
     else:
             # 1. Define your data
             gyms = [
@@ -471,6 +494,31 @@ else:
                 {"name": "Zen Cardio Station", "type": "Cardio", "dist": 1.2, "equip": "Treadmills"},
                 {"name": "Apex CrossFit Lab", "type": "HIIT", "dist": 2.5, "equip": "Olympic Platforms"}
             ]
+        else:
+    st.markdown(
+        "<div class='module-strip'><h2>🗺️ Module 7: Gym Recommender Gateway</h2></div>",
+        unsafe_allow_html=True
+    )
+
+    if dev_mode:
+        st.markdown("""
+        <div class='defense-box'>
+            <strong>💡 STUDENT ENGINEERING LOG & DEFENSE:</strong><br>
+            "This module demonstrates recommendation system principles.
+            I created a structured dataset containing gym attributes such
+            as distance, training specialization, and equipment availability.
+            The filtering engine dynamically evaluates user preferences and
+            applies conditional selection logic to return only facilities
+            matching the chosen criteria. This simulates location-aware
+            recommendation pipelines used in fitness and navigation apps."
+        </div>
+        """, unsafe_allow_html=True)
+
+        gyms = [
+            {"name": "ProPulse Downtown Hub", "type": "Strength", "dist": 0.8, "equip": "Smart-rowers"},
+            {"name": "Zen Cardio Station", "type": "Cardio", "dist": 1.2, "equip": "Treadmills"},
+            {"name": "Apex CrossFit Lab", "type": "HIIT", "dist": 2.5, "equip": "Olympic Platforms"}
+        ]
             
             # 2. Interactive Filters
             col_a, col_b = st.columns(2)
@@ -499,4 +547,36 @@ else:
             # Display currently selected gym
             if "selected_gym" in st.session_state:
                 st.success(f"✅ Current Active Facility: {st.session_state['selected_gym']}")
+
+        
+            
+            # 2. Interactive Filters
+            col_a, col_b = st.columns(2)
+            with col_a:
+                selected_type = st.multiselect("Filter by Type:", ["Strength", "Cardio", "HIIT"], default=["Strength"])
+            with col_b:
+                max_dist = st.slider("Max Distance (miles):", 0.1, 5.0, 3.0)
+            
+            # 3. Dynamic Filter Logic
+            filtered_gyms = [g for g in gyms if g["type"] in selected_type and g["dist"] <= max_dist]
+            
+            # 4. Single-pass Rendering
+            if filtered_gyms:
+                for gym in filtered_gyms:
+                    # Create a clean row for each gym
+                    with st.container():
+                        st.info(f"📍 **{gym['name']}** ({gym['dist']} miles) — Focus: {gym['equip']}")
+                        
+                        # Use a unique key for the button based on the gym name
+                        if st.button(f"Select {gym['name']}", key=f"select_{gym['name']}"):
+                            st.session_state["selected_gym"] = gym['name']
+                            st.rerun() # Refresh to update the UI immediately
+            else:
+                st.warning("No facilities match your specific filters.")
+
+            # Display currently selected gym
+            if "selected_gym" in st.session_state:
+                st.success(f"✅ Current Active Facility: {st.session_state['selected_gym']}")
+
+            
                 
