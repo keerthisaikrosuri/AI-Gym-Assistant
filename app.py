@@ -193,10 +193,12 @@ else:
     nav_left, nav_right = st.columns([4, 1])
     
     with nav_left:
-        if st.button("← Back to Main Tactical Command Center Dashboard", key="back_to_menu"):
-        st.session_state["selected_module"] = "Menu"
-        st.session_state["nav_radio"] = "Menu"
-        st.rerun()
+        if st.button(
+            "← Back to Main Tactical Command Center Dashboard", 
+            key="back_to_menu"
+        ):
+            st.session_state["selected_module"] = "Menu"
+            st.rerun()
         
     with nav_right:
         dev_mode = st.toggle("🛡️ Architectural Defense Mode", value=False)
