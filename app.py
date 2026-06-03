@@ -387,53 +387,58 @@ else:
     # =====================================================
     # MODULE 5: Virtual Gym Buddy
     # =====================================================
-    current_exec_module = current_exec_module.strip()
     elif current_exec_module == "Module 5":
-        st.markdown("<div class='module-strip'><h2>💬 Module 5: Virtual Gym Buddy (AI Chat Companion)</h2></div>", unsafe_allow_html=True)
+    
+        st.markdown(
+            "<div class='module-strip'><h2>💬 Module 5: Virtual Gym Buddy (AI Chat Companion)</h2></div>",
+            unsafe_allow_html=True
+        )
     
         score = st.session_state.get("performance_score", 82)
     
-        
-    if "chat_input" not in st.session_state:
-        st.session_state["chat_input"] = ""
+        # INIT CHAT HISTORY
+        if "chat_history" not in st.session_state:
+            st.session_state["chat_history"] = []
     
-    st.session_state["chat_input"] = st.text_input("Enter message", value=st.session_state["chat_input"])
+        # INPUT (NOT inside session_state assignment loop)
+        user_msg = st.text_input("Enter message")
     
-    # SEND BUTTON
-    if st.button("Send Chat Message"):
+        if st.button("Send Chat Message"):
     
-        user_msg = st.session_state["chat_input"]
+            if user_msg and user_msg.strip():
     
-        if user_msg.strip() != "":
+                analysis = sentiment_engine(user_msg)[0]
+                sentiment_label = analysis['label']
     
-            analysis = sentiment_engine(user_msg)[0]
-            sentiment_label = analysis['label']
+                if sentiment_label == "NEGATIVE" and score < 75:
+                    reply = "I noticed your form score is struggling. Don't push for PRs today—let's prioritize mobility."
+                elif sentiment_label == "POSITIVE":
+                    reply = "High energy detected! Your score is strong. Let's aim to increase your load by 5% today."
+                else:
+                    reply = "Consistency is key. Focus on clean movement patterns."
     
-            score = st.session_state.get("performance_score", 82)
+                st.session_state["chat_history"].append({
+                    "sender": "Athlete",
+                    "msg": user_msg,
+                    "sentiment": sentiment_label
+                })
     
-            if sentiment_label == "NEGATIVE" and score < 75:
-                reply = "I noticed your form score is struggling. Don't push for PRs today—let's prioritize mobility."
-            elif sentiment_label == "POSITIVE":
-                reply = "High energy detected! Your score is strong. Let's aim to increase your load by 5% today."
-            else:
-                reply = "Consistency is key. Focus on clean movement patterns."
+                st.session_state["chat_history"].append({
+                    "sender": "Buddy AI",
+                    "msg": reply,
+                    "sentiment": "NEUTRAL"
+                })
     
-            st.session_state["chat_history"].append({
-                "sender": "Athlete",
-                "msg": user_msg,
-                "sentiment": sentiment_label
-            })
+                st.rerun()
     
-            st.session_state["chat_history"].append({
-                "sender": "Buddy AI",
-                "msg": reply,
-                "sentiment": "NEUTRAL"
-            })
+        # DISPLAY CHAT
+        st.markdown("### 💬 Active Conversation History")
     
-            # CLEAR INPUT AFTER SENDING
-            st.session_state["chat_input"] = ""
-    
-            st.rerun()
+        for text_log in reversed(st.session_state["chat_history"]):
+            st.markdown(
+                f"**{text_log['sender']}**: {text_log['msg']} ({text_log['sentiment']})"
+            )
+            
     # =====================================================
     # MODULE 6: POSE ANALYZER
     # =====================================================
