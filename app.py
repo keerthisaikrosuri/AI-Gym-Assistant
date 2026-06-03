@@ -469,10 +469,10 @@ else:
                 {"name": "Apex CrossFit Lab", "type": "HIIT", "dist": 2.5, "equip": "Olympic Platforms"}
             ]
         else:
-    st.markdown(
-        "<div class='module-strip'><h2>🗺️ Module 7: Gym Recommender Gateway</h2></div>",
-        unsafe_allow_html=True
-    )
+            st.markdown(
+            "<div class='module-strip'><h2>🗺️ Module 7: Gym Recommender Gateway</h2></div>",
+            unsafe_allow_html=True
+            )
 
     if dev_mode:
         st.markdown("""
