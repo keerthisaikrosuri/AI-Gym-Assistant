@@ -76,28 +76,31 @@ col3.metric("System Status", "Stable")
 st.markdown("---")
 
 with st.sidebar:
-    # Navigation
     st.markdown("### 🛰️ SYSTEM MONITOR")
 
-    all_modules = ["Menu", "Module 1", "Module 2", "Module 3", "Module 4", "Module 5", "Module 6", "Module 7"]
+    all_modules = [
+        "Menu",
+        "Module 1",
+        "Module 2",
+        "Module 3",
+        "Module 4",
+        "Module 5",
+        "Module 6",
+        "Module 7"
+    ]
 
-    # Use an index to keep the radio button in sync with session_state
-    current_idx = all_modules.index(st.session_state.get("selected_module", "Menu"))
+    selection = st.radio(
+        "Navigation",
+        all_modules,
+        key="nav_radio"
+    )
 
-    #selection = st.radio(
-    #"Navigation",
-    #all_modules,
-    #index=current_idx,
-    #key="nav_radio" )
+    if selection != st.session_state["selected_module"]:
+        st.session_state["selected_module"] = selection
+        st.rerun()
 
-#if selection != st.session_state["selected_module"]:
-    #st.session_state["selected_module"] = selection
-    
-    # Metrics
     st.metric("System Uptime", "99.9%")
     st.metric("AI Load", "14%")
-
-st.write("DEBUG:", st.session_state["selected_module"])
 
 # =========================================================
 # CACHED BACKEND DEEP LEARNING MODEL AGGREGATORS
