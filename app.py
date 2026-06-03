@@ -3,8 +3,9 @@ import numpy as np
 import time
 import cv2
 import mediapipe as mp
-from mediapipe.python.solutions import pose as mp_pose
-from mediapipe.python.solutions import drawing_utils as mp_drawing
+
+mp_pose = mp.solutions.pose
+mp_drawing = mp.solutions.drawing_utils
 
 # 1. HELPER FUNCTIONS 
 def calculate_angle(a, b, c):
