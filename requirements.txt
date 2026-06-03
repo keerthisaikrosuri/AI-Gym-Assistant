@@ -2,9 +2,8 @@ streamlit
 numpy
 plotly
 scikit-learn
-transformers
-torch
-sentence-transformers
 mediapipe
 pillow
 opencv-python-headless
+transformers
+sentence-transformers
