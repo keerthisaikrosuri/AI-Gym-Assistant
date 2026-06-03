@@ -2,7 +2,6 @@ import streamlit as st
 import numpy as np
 import random
 import time
-import datetime
 import plotly.graph_objects as go
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
@@ -94,9 +93,11 @@ with st.sidebar:
         all_modules,
         index=all_modules.index(st.session_state["selected_module"])
     )
-
-    st.session_state["selected_module"] = selection
-
+    
+    if selection != st.session_state["selected_module"]:
+         st.session_state["selected_module"] = selection
+         st.rerun()
+    
     st.metric("System Uptime", "99.9%")
     st.metric("AI Load", "14%")
 
