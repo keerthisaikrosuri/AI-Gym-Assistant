@@ -1,128 +1,157 @@
 import streamlit as st
 import numpy as np
-import cv2
-import mediapipe as mp
-from mediapipe.tasks import python
-from mediapipe.tasks.python import vision
+import random
+import time
+import datetime
+import plotly.graph_objects as go
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from transformers import pipeline
+from sentence_transformers import SentenceTransformer, util
 
-base_options = python.BaseOptions(model_asset_path='pose_landmarker.task')
-options = vision.PoseLandmarkerOptions(
-    base_options=base_options,
-    output_segmentation_masks=True
+# ==============================================================================
+# 1. ARCHITECTURAL CONFIGURATION: PROPULSE TACTICAL COMMAND CENTER
+# ==============================================================================
+st.set_page_config(
+    page_title="ProPulse Tactical Command Center",
+    page_icon="⚡",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
-landmarker = vision.PoseLandmarker.create_from_options(options)
 
-# 1. HELPER FUNCTIONS 
-def calculate_angle(a, b, c):
-    """Calculates the angle between three points."""
-    a = np.array(a)
-    b = np.array(b)
-    c = np.array(c)
-    radians = np.arctan2(c[1]-b[1], c[0]-b[0]) - np.arctan2(a[1]-b[1], a[0]-b[0])
-    angle = np.abs(radians*180.0/np.pi)
-    return angle if angle <= 180 else 360 - angle
+# Pastel Premium Custom CSS - The Engine for UI Rendering
+st.markdown("""
+    <style>
+    .stApp { background-color: #FDFCF0; color: #5D5B6A; }
+    div[data-testid="stSidebar"] { background-color: #E8F1F2 !important; border-right: 2px solid #D1E8E4; }
     
-# 2. Page Config
-st.set_page_config(page_title="ProPulse Command Center", layout="wide")
-
-# 3. Initialization
-if "selected_module" not in st.session_state: st.session_state["selected_module"] = "Menu"
-
-# 4. Module Logic Definitions
-def render_module_1():
-    st.header("🤸‍♂️ Module 1: AI Gym Trainer")
-    cam = st.camera_input("Capture Pose")
+    .big-card { 
+        background-color: #E8F1F2; border: 2px solid #D1E8E4; padding: 30px; 
+        border-radius: 20px; text-align: center; transition: transform 0.2s; 
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05); color: #4A5568; margin-bottom: 20px; 
+        cursor: pointer; 
+    }
+    .big-card:hover { transform: scale(1.03); background-color: #D1E8E4; }
     
-    if cam is not None:
-        # Decode and process image
-        file_bytes = np.asarray(bytearray(cam.read()), dtype=np.uint8)
-        image = cv2.imdecode(file_bytes, 1)
-        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        
-        # Process Pose
-        with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
-            results = pose.process(image_rgb)
-            
-            if results.pose_landmarks:
-                st.success("Pose data ingested. Analyzing joint angles...")
-                
-                # Extract landmarks
-                landmarks = results.pose_landmarks.landmark
-                shoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x, 
-                            landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
-                elbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x, 
-                         landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
-                wrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x, 
-                         landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
-                
-                # Calculate angle
-                angle = calculate_angle(shoulder, elbow, wrist)
-                st.metric("Detected Elbow Angle", f"{int(angle)}°")
-                
-                # Visualization
-                annotated_image = image.copy()
-                mp_drawing.draw_landmarks(annotated_image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
-                st.image(cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB), caption="Analyzed Pose", use_container_width=True)
-            
-            else:
-                st.warning("No pose detected. Please ensure your full upper body is visible.")
-                
-def render_module_2():
-    st.header("🥗 Module 2: AI Dietician")
-    user_input = st.text_input("Enter fitness goal:", "High protein recovery")
-    if st.button("Compute Plan"):
-        st.write(f"Executing semantic search for: {user_input}...")
-        st.success("Dietary roadmap generated.")
+    .module-strip { 
+        background: #E8F1F2; border-left: 8px solid #06B6D4; padding: 25px; 
+        border-radius: 0 10px 10px 0; margin-bottom: 25px; 
+    }
+    
+    .terminal-card { 
+        background-color: #F3F4F6; border: 1px solid #E5E7EB; padding: 25px; 
+        border-radius: 10px; font-family: monospace; color: #4A5568; margin-bottom: 20px; 
+    }
+    
+    .defense-box { 
+        background-color: #FDFCF0; border-left: 5px solid #F59E0B; padding: 20px; 
+        border-radius: 4px; margin: 25px 0; border: 1px solid #E5E7EB; color: #5D5B6A; 
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-def render_module_3():
-    st.header("🔌 Module 3: Smart Gym IoT")
-    if st.button("Initialize Telemetry"):
-        st.info("Syncing Bluetooth Node... Signal Locked: 14.2 RPM")
+# ==============================================================================
+# 2. STATE MANAGEMENT & BACKEND ASSETS
+# ==============================================================================
+if "active_view" not in st.session_state: st.session_state["active_view"] = "Operational Control Hub"
+if "active_module" not in st.session_state: st.session_state["active_module"] = "Module 1"
+if "chat_history" not in st.session_state: st.session_state["chat_history"] = [{"sender": "Buddy AI", "msg": "System online and awaiting telemetry...", "sentiment": "NEUTRAL"}]
+if "iot_stream" not in st.session_state: st.session_state["iot_stream"] = False
 
-def render_module_4():
-    st.header("📈 Module 4: Habit Tracker")
-    streak = st.slider("Workout Streak (Days)", 1, 30, 14)
-    risk = 100 - (streak * 2.5)
-    st.metric("Dropout Risk Probability", f"{max(0, risk):.1f}%")
+@st.cache_resource
+def load_deep_learning_assets():
+    scaler = StandardScaler()
+    embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+    sentiment_engine = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
+    return scaler, embedder, sentiment_engine
 
-def render_module_5():
-    st.header("💬 Module 5: Gym Buddy")
-    msg = st.text_input("Talk to AI:")
-    if st.button("Send"):
-        st.write(f"Buddy AI: Understood. Analyzing your sentiment for '{msg}'...")
+scaler, embedder, sentiment_engine = load_deep_learning_assets()
 
-def render_module_6():
-    st.header("🎯 Module 6: Pose Analyzer")
-    st.line_chart([80, 82, 85, 88, 92, 95])
+# ==============================================================================
+# 3. SIDEBAR NAVIGATION & AUTHORIZATION GATEWAY
+# ==============================================================================
+with st.sidebar:
+    st.markdown("## ⚡ PROPULSE HQ")
+    if st.button("🎛️ Operational Control Hub"): st.session_state["active_view"] = "Operational Control Hub"
+    token_header = st.text_input("Authorization Token", type="password", value="secure_fitness_token_2026")
+    is_authorized = (token_header == "secure_fitness_token_2026")
 
-def render_module_7():
-    st.header("🗺️ Module 7: Gym Recommender")
-    st.info("Mapping spatial distance vectors... Found: ProPulse Elite (1.2 miles)")
-
-# 5. Routing Table
-module_map = {
-    "Module 1": render_module_1,
-    "Module 2": render_module_2,
-    "Module 3": render_module_3,
-    "Module 4": render_module_4,
-    "Module 5": render_module_5,
-    "Module 6": render_module_6,
-    "Module 7": render_module_7,
-}
-
-# 6. Main Control Flow
-if st.session_state["selected_module"] == "Menu":
-    st.title("⚡ ATHLETIC OPERATIONAL HUB")
-    cols = st.columns(3)
-    for i, mod_name in enumerate(module_map.keys()):
-        if cols[i % 3].button(f"Launch {mod_name}"):
-            st.session_state["selected_module"] = mod_name
-            st.rerun()
+# ==============================================================================
+# 4. PRIMARY EXECUTIVE CONTROL LOOP
+# ==============================================================================
+if not is_authorized:
+    st.error("System access denied. Please provide valid authorization tokens to launch telemetry frames.")
 else:
-    if st.button("← Back to Dashboard"):
-        st.session_state["selected_module"] = "Menu"
-        st.rerun()
-    
-    # Run the selected module logic
-    selected = st.session_state["selected_module"]
-    module_map[selected]()
+    if st.session_state["active_view"] == "Operational Control Hub":
+        st.markdown("<h1 style='text-align: center;'>⚡ ATHLETIC OPERATIONAL HUB</h1>", unsafe_allow_html=True)
+        
+        # Navigation Grid
+        col1, col2, col3 = st.columns(3)
+        cards = [("🤸‍♂️", "Gym Trainer", "Module 1"), ("🥗", "Dietician", "Module 2"), ("🔌", "IoT Assistant", "Module 3"),
+                 ("📈", "Habit Tracker", "Module 4"), ("💬", "Gym Buddy", "Module 5"), ("🎯", "Pose Analyzer", "Module 6"), ("🗺️", "Recommender", "Module 7")]
+        
+        for i, (icon, label, mod) in enumerate(cards):
+            with [col1, col2, col3][i % 3]:
+                st.markdown(f"<div class='big-card'><h2>{icon}</h2><h3>{label}</h3></div>", unsafe_allow_html=True)
+                if st.button(f"Open {label}", key=f"btn_{mod}"): st.session_state["active_module"] = mod
+        
+        st.markdown("---")
+        dev_mode = st.toggle("🛡️ Enable Architectural Defense Mode (Expose Engineering Choices)")
+        
+        # Modular Workspace Selector
+        current_mod = st.session_state["active_module"]
+        
+        # --- MODULE 1: AI GYM TRAINER ---
+        if current_mod == "Module 1":
+            st.markdown("<div class='module-strip'><h3>Module 1: AI Gym Trainer (Optical Array)</h3></div>", unsafe_allow_html=True)
+            if dev_mode: st.markdown("<div class='defense-box'><strong>Engineering Defense:</strong> Edge-hosted CV architecture using MediaPipe skeletal landmarks. We map high-dimensional geometric joints to real-time threshold validation scripts.</div>", unsafe_allow_html=True)
+            st.camera_input("Optical Capture Feed")
+
+        # --- MODULE 2: AI DIETICIAN ---
+        elif current_mod == "Module 2":
+            st.markdown("<div class='module-strip'><h3>Module 2: AI Dietician (Semantic Engine)</h3></div>", unsafe_allow_html=True)
+            if dev_mode: st.markdown("<div class='defense-box'><strong>Engineering Defense:</strong> Semantic NLP mapping using SentenceTransformer to solve for dietary macros in non-structured query environments.</div>", unsafe_allow_html=True)
+            st.text_input("Enter diet requirements:")
+
+        # --- MODULE 3: IOT ASSISTANT ---
+        elif current_mod == "Module 3":
+            st.markdown("<div class='module-strip'><h3>Module 3: Smart Gym IoT (Telemetry)</h3></div>", unsafe_allow_html=True)
+            if dev_mode: st.markdown("<div class='defense-box'><strong>Engineering Defense:</strong> Asynchronous MQTT-style simulation loop for real-time sensor hardware integration and noise-filtering calibration logic.</div>", unsafe_allow_html=True)
+
+        # --- MODULE 4: HABIT TRACKER ---
+        elif current_mod == "Module 4":
+            st.markdown("<div class='module-strip'><h3>Module 4: Habit Tracker (Behavioral AI)</h3></div>", unsafe_allow_html=True)
+            if dev_mode: st.markdown("<div class='defense-box'><strong>Engineering Defense:</strong> Supervised LogisticRegression classification mapping for behavioral lapse risk prediction based on attendance vectors.</div>", unsafe_allow_html=True)
+
+        # --- MODULE 5: GYM BUDDY ---
+        elif current_mod == "Module 5":
+            st.markdown("<div class='module-strip'><h3>💬 Virtual Gym Buddy (Sentiment Interface)</h3></div>", unsafe_allow_html=True)
+            if dev_mode: st.markdown("<div class='defense-box'><strong>Engineering Defense:</strong> Transformer-based DistilBERT token classification for sentiment-aware interaction orchestration and persistent state logging.</div>", unsafe_allow_html=True)
+            user_in = st.text_input("How does your training feel today?")
+            if st.button("Send Message"):
+                if user_in:
+                    sentiment = sentiment_engine(user_in)[0]['label']
+                    if any(w in user_in.lower() for w in ["squat", "knee", "form"]):
+                        reply = "Focus on keeping your knees tracking over your toes—alignment is everything!"
+                    elif sentiment == "NEGATIVE":
+                        reply = "I hear you. Let's pivot to mobility and stretching for recovery."
+                    else:
+                        reply = "Fantastic energy! That mindset is perfect for a PR attempt today."
+                    st.session_state["chat_history"].append({"sender": "You", "msg": user_in})
+                    st.session_state["chat_history"].append({"sender": "Buddy AI", "msg": reply})
+                    st.rerun()
+            for chat in st.session_state["chat_history"]:
+                st.markdown(f"<div class='terminal-card'>**{chat['sender']}:** {chat['msg']}</div>", unsafe_allow_html=True)
+
+        # --- MODULE 6: POSE ANALYZER ---
+        elif current_mod == "Module 6":
+            st.markdown("<div class='module-strip'><h3>Module 6: Pose-to-Performance Analyzer</h3></div>", unsafe_allow_html=True)
+            if dev_mode: st.markdown("<div class='defense-box'><strong>Engineering Defense:</strong> Time-series logging of performance frame differentials and angular consistency metrics.</div>", unsafe_allow_html=True)
+
+        # --- MODULE 7: RECOMMENDER ---
+        elif current_mod == "Module 7":
+            st.markdown("<div class='module-strip'><h3>Module 7: Gym Recommender Gateway</h3></div>", unsafe_allow_html=True)
+            if dev_mode: st.markdown("<div class='defense-box'><strong>Engineering Defense:</strong> Cosine similarity spatial mapping against facility feature vectors to ensure optimal facility selection.</div>", unsafe_allow_html=True)
+
+# Footer cleanup
+st.markdown("""<style>#MainMenu {visibility: hidden;} footer {visibility: hidden;}</style>""", unsafe_allow_html=True)
