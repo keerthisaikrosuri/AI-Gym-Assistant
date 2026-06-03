@@ -460,70 +460,67 @@ else:
     # =====================================================
     # MODULE 7: GYM RECOMMENDER
     # =====================================================
-    # =====================================================
-# MODULE 7: GYM RECOMMENDER
-# =====================================================
-elif current_exec_module == "Module 7":
+    elif current_exec_module == "Module 7":
 
-    st.markdown(
-        "<div class='module-strip'><h2>🗺️ Module 7: Gym Recommender Gateway</h2></div>",
-        unsafe_allow_html=True
-    )
-
-    # Dev mode explanation
-    if dev_mode:
-        st.markdown("""
-        <div class='defense-box'>
-            <strong>💡 STUDENT ENGINEERING LOG & DEFENSE:</strong><br>
-            "This module demonstrates recommendation system principles.
-            I created a structured dataset containing gym attributes such
-            as distance, training specialization, and equipment availability.
-            The filtering engine dynamically evaluates user preferences and
-            applies conditional selection logic to return matching gyms."
-        </div>
-        """, unsafe_allow_html=True)
-
-    # 1. Gym dataset
-    gyms = [
-        {"name": "ProPulse Downtown Hub", "type": "Strength", "dist": 0.8, "equip": "Smart-rowers"},
-        {"name": "Zen Cardio Station", "type": "Cardio", "dist": 1.2, "equip": "Treadmills"},
-        {"name": "Apex CrossFit Lab", "type": "HIIT", "dist": 2.5, "equip": "Olympic Platforms"}
-    ]
-
-    # 2. Interactive Filters
-    col_a, col_b = st.columns(2)
-
-    with col_a:
-        selected_type = st.multiselect(
-            "Filter by Type:",
-            ["Strength", "Cardio", "HIIT"],
-            default=["Strength"]
+        st.markdown(
+            "<div class='module-strip'><h2>🗺️ Module 7: Gym Recommender Gateway</h2></div>",
+            unsafe_allow_html=True
         )
-
-    with col_b:
-        max_dist = st.slider("Max Distance (miles):", 0.1, 5.0, 3.0)
-
-    # 3. Filter logic
-    filtered_gyms = [
-        g for g in gyms
-        if g["type"] in selected_type and g["dist"] <= max_dist
-    ]
-
-    # 4. Display results
-    if filtered_gyms:
-        for gym in filtered_gyms:
-            with st.container():
-                st.info(f"📍 **{gym['name']}** ({gym['dist']} miles) — Focus: {gym['equip']}")
-
-                if st.button(f"Select {gym['name']}", key=f"select_{gym['name']}"):
-                    st.session_state["selected_gym"] = gym["name"]
-                    st.rerun()
-    else:
-        st.warning("No facilities match your specific filters.")
-
-    # 5. Selected gym display
-    if "selected_gym" in st.session_state:
-        st.success(f"✅ Current Active Facility: {st.session_state['selected_gym']}")
+    
+        # Dev mode explanation
+        if dev_mode:
+            st.markdown("""
+            <div class='defense-box'>
+                <strong>💡 STUDENT ENGINEERING LOG & DEFENSE:</strong><br>
+                "This module demonstrates recommendation system principles.
+                I created a structured dataset containing gym attributes such
+                as distance, training specialization, and equipment availability.
+                The filtering engine dynamically evaluates user preferences and
+                applies conditional selection logic to return matching gyms."
+            </div>
+            """, unsafe_allow_html=True)
+    
+        # 1. Gym dataset
+        gyms = [
+            {"name": "ProPulse Downtown Hub", "type": "Strength", "dist": 0.8, "equip": "Smart-rowers"},
+            {"name": "Zen Cardio Station", "type": "Cardio", "dist": 1.2, "equip": "Treadmills"},
+            {"name": "Apex CrossFit Lab", "type": "HIIT", "dist": 2.5, "equip": "Olympic Platforms"}
+        ]
+    
+        # 2. Interactive Filters
+        col_a, col_b = st.columns(2)
+    
+        with col_a:
+            selected_type = st.multiselect(
+                "Filter by Type:",
+                ["Strength", "Cardio", "HIIT"],
+                default=["Strength"]
+            )
+    
+        with col_b:
+            max_dist = st.slider("Max Distance (miles):", 0.1, 5.0, 3.0)
+    
+        # 3. Filter logic
+        filtered_gyms = [
+            g for g in gyms
+            if g["type"] in selected_type and g["dist"] <= max_dist
+        ]
+    
+        # 4. Display results
+        if filtered_gyms:
+            for gym in filtered_gyms:
+                with st.container():
+                    st.info(f"📍 **{gym['name']}** ({gym['dist']} miles) — Focus: {gym['equip']}")
+    
+                    if st.button(f"Select {gym['name']}", key=f"select_{gym['name']}"):
+                        st.session_state["selected_gym"] = gym["name"]
+                        st.rerun()
+        else:
+            st.warning("No facilities match your specific filters.")
+    
+        # 5. Selected gym display
+        if "selected_gym" in st.session_state:
+            st.success(f"✅ Current Active Facility: {st.session_state['selected_gym']}")
         
 else:
     st.warning("Invalid module selected")
