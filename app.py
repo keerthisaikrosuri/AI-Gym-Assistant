@@ -209,7 +209,10 @@ else:
         with cam_col2:
             st.markdown("### 🧬 Repetition Accuracy Benchmark")
             
-   if camera_capture_data is not None:
+            # Initialize angle to avoid NameError
+            calculated_angle = None 
+
+            if camera_capture_data is not None:
                 try:
                     img = Image.open(camera_capture_data)
                     img_array = np.array(img)
@@ -217,12 +220,10 @@ else:
 
                     if results.pose_landmarks:
                         landmarks = results.pose_landmarks.landmark
-                        # Extract Hip(24), Knee(26), Ankle(28)
                         hip = [landmarks[24].x, landmarks[24].y]
                         knee = [landmarks[26].x, landmarks[26].y]
                         ankle = [landmarks[28].x, landmarks[28].y]
 
-                        # Calculate angle
                         radians = np.arctan2(ankle[1]-knee[1], ankle[0]-knee[0]) - \
                                   np.arctan2(hip[1]-knee[1], hip[0]-knee[0])
                         angle = np.abs(radians * 180.0 / np.pi)
@@ -230,17 +231,15 @@ else:
                         
                         calculated_angle = angle
                         st.write(f"Detected Knee Angle: {calculated_angle:.1f}°")
-                        
-                        # Now pass 'calculated_angle' to your Feedback Status logic
                     else:
-                        st.warning("Pose landmarks not detected. Please ensure your full leg is visible.")
+                        st.warning("Pose landmarks not detected.")
                 except Exception as e:
                     st.error(f"Processing error: {e}")
             else:
-                st.info("Waiting for camera capture...")
+                st.info("Waiting for camera capture to begin analysis...")
 
-                
-                # 2. Feedback Status
+            # FEEDBACK STATUS (Only runs if we have a calculated_angle)
+            if calculated_angle is not None:
                 if calculated_angle < 90.0:
                     st.markdown("<p style='color: #EF4444; font-weight:700;'>⚠️ STATUS: SHALLOW POSITION</p>", unsafe_allow_html=True)
                     st.write("Drive your hips lower to hit a perfect 90-degree squat form.")
@@ -248,16 +247,14 @@ else:
                     st.markdown("<p style='color: #10B981; font-weight:700;'>✅ STATUS: STANDARD DEPTH VALIDATED</p>", unsafe_allow_html=True)
                     st.write("Perfect movement execution! Your body alignment looks excellent.")
                 
-                # 3. Optional: Show Tech Specs only if dev_mode is on
+                # TECH SPECS
                 if dev_mode:
                     st.markdown("**Simulated MediaPipe Tensor Anchors:**")
                     st.markdown(f"""
                     <div class='terminal-card'>
-                        [CALCULATED_FLEXION] => <b>{calculated_angle}°</b>
+                        [CALCULATED_FLEXION] => <b>{calculated_angle:.1f}°</b>
                     </div>
                     """, unsafe_allow_html=True)
-            else:
-                st.info("Waiting for camera capture to begin analysis...")
                 
     # =====================================================
     # MODULE 2: AI DIETICIAN
