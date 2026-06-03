@@ -9,7 +9,7 @@ from transformers import pipeline
 from sentence_transformers import SentenceTransformer, util
 
 # =========================================================
-# APPLICATION CONFIGURATION & SOFT PASTEL THEME WRAPPER
+# APPLICATION CONFIGURATION 
 # =========================================================
 st.set_page_config(
     page_title="ProPulse Tactical Command Center",
@@ -429,11 +429,7 @@ else:
                 st.rerun()
     
     
-    # =====================================================
-    # FINAL ELSE (MUST BE LAST)
-    # =====================================================
-    else:
-        st.warning("Invalid module selected")
+    
 
     
     # =====================================================
@@ -460,12 +456,8 @@ else:
             col_p1, col_p2 = st.columns(2)
             with col_p1: st.metric("Movement Precision Score", f"{calculated_performance_score} / 100")
             with col_p2: st.metric("Form Efficiency Level", "Optimal Range Match" if calculated_performance_score > 90 else "Awaiting Adjustment")
-
-    # =====================================================
-    # MODULE 7: GYM RECOMMENDER
-    # =====================================================
     
-        # =====================================================
+    # =====================================================
     # MODULE 7: GYM RECOMMENDER
     # =====================================================
     
