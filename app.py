@@ -522,5 +522,5 @@ else:
         if "selected_gym" in st.session_state:
             st.success(f"✅ Current Active Facility: {st.session_state['selected_gym']}")
         
-else:
-    st.warning("Invalid module selected")
+    else:
+        st.warning("Invalid module selected")
