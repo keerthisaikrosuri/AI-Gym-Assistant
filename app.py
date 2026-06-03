@@ -9,6 +9,7 @@ from sklearn.preprocessing import StandardScaler
 from transformers import pipeline
 from sentence_transformers import SentenceTransformer, util
 import mediapipe as mp
+from PIL import Image
 
 # Initialize MediaPipe Pose once
 mp_pose = mp.solutions.pose
@@ -195,7 +196,10 @@ else:
     # =====================================================
     # MODULE 1: AI GYM TRAINER
     # =====================================================
-    elif current_exec_module == "Module 1":
+if current_exec_module == "Module 0": 
+    pass   
+    
+elif current_exec_module == "Module 1":
         st.markdown("<div class='module-strip'><h2>🤸‍♂️ Module 1: AI Gym Trainer (Workout Detection & Feedback)</h2></div>", unsafe_allow_html=True)
         
         # [Keep your existing dev_mode defense-box code here]
