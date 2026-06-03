@@ -19,6 +19,20 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# Initialize Robust Session State Variables
+if "selected_module" not in st.session_state:
+    st.session_state["selected_module"] = "Menu"
+if "iot_stream" not in st.session_state:
+    st.session_state["iot_stream"] = False
+if "calibrated" not in st.session_state:
+    st.session_state["calibrated"] = False
+if "grocery_list" not in st.session_state:
+    st.session_state["grocery_list"] = []
+if "chat_history" not in st.session_state:
+    st.session_state["chat_history"] = [
+        {"time": "14:22:05", "sender": "Buddy AI", "msg": "System online. Waiting for athlete state log inputs...", "sentiment": "NEUTRAL"}
+    ]
+
 #  CSS COMPLIANCE SHIELD 
 st.markdown("""
     <style>
@@ -64,35 +78,26 @@ st.markdown("---")
 with st.sidebar:
     # Navigation
     st.markdown("### 🛰️ SYSTEM MONITOR")
-    
-    # Use the full list so your app feels complete for the judges
+
     all_modules = ["Menu", "Module 1", "Module 2", "Module 3", "Module 4", "Module 5", "Module 6", "Module 7"]
-    
-    # This stores the selection in session_state, which is the "right" way for Streamlit apps
-    selected = st.radio("Navigation", all_modules)
-    
-    # Update the global state so the rest of your app knows what to show
-    st.session_state["selected_module"] = selected
-    
-    st.markdown("---")
+
+    # Use an index to keep the radio button in sync with session_state
+    current_idx = all_modules.index(st.session_state.get("selected_module", "Menu"))
+
+    selection = st.radio(
+    "Navigation",
+    all_modules,
+    index=current_idx,
+    key="nav_radio"
+)
+
+    if selection != st.session_state.get("selected_module"):
+        st.session_state["selected_module"] = selection
+        st.rerun()
     
     # Metrics
     st.metric("System Uptime", "99.9%")
     st.metric("AI Load", "14%")
-
-# Initialize Robust Session State Variables
-if "selected_module" not in st.session_state:
-    st.session_state["selected_module"] = "Menu"
-if "iot_stream" not in st.session_state:
-    st.session_state["iot_stream"] = False
-if "calibrated" not in st.session_state:
-    st.session_state["calibrated"] = False
-if "grocery_list" not in st.session_state:
-    st.session_state["grocery_list"] = []
-if "chat_history" not in st.session_state:
-    st.session_state["chat_history"] = [
-        {"time": "14:22:05", "sender": "Buddy AI", "msg": "System online. Waiting for athlete state log inputs...", "sentiment": "NEUTRAL"}
-    ]
 
 # =========================================================
 # CACHED BACKEND DEEP LEARNING MODEL AGGREGATORS
@@ -443,6 +448,7 @@ else:
         if st.button("Compile Performance Report Card", use_container_width=True):
             st.success("📊 Weekly Progress Card Successfully Calculated")
             calculated_performance_score = 82 + (selected_load_multiplier * 3)
+            st.session_state["performance_score"] = calculated_performance_score
             
             col_p1, col_p2 = st.columns(2)
             with col_p1: st.metric("Movement Precision Score", f"{calculated_performance_score} / 100")
