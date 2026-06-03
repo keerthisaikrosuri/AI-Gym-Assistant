@@ -3,6 +3,5 @@ numpy
 plotly
 scikit-learn
 transformers
-sentence-transformers
 torch
-tensorflow
+sentence-transformers
