@@ -90,8 +90,8 @@ with st.sidebar:
     #index=current_idx,
     #key="nav_radio" )
 
-if selection != st.session_state["selected_module"]:
-    st.session_state["selected_module"] = selection
+#if selection != st.session_state["selected_module"]:
+    #st.session_state["selected_module"] = selection
     
     # Metrics
     st.metric("System Uptime", "99.9%")
