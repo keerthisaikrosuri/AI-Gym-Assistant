@@ -424,13 +424,9 @@ else:
                     "msg": reply,
                     "sentiment": "NEUTRAL"
                 })
-    
-                st.session_state["chat_input"] = ""
+
                 st.rerun()
     
-    
-    
-
     
     # =====================================================
     # MODULE 6: POSE ANALYZER
