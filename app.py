@@ -9,8 +9,9 @@ import mediapipe as mp
 from PIL import Image
 import cv2 
 
- # Initialize MediaPipe Pose inside the function or globally
-    mp_pose = mp.solutions.pose
+# GLOBAL INITIALIZATION 
+mp_pose = mp.solutions.pose
+mp_drawing = mp.solutions.drawing_utils
 
 # 1. HELPER FUNCTIONS 
 def calculate_angle(a, b, c):
