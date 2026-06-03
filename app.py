@@ -7,6 +7,7 @@ from transformers import pipeline
 from sentence_transformers import SentenceTransformer, util
 import mediapipe as mp
 from PIL import Image
+import cv2 
 
 # 1. HELPER FUNCTIONS 
 def calculate_angle(a, b, c):
@@ -28,8 +29,40 @@ if "selected_module" not in st.session_state: st.session_state["selected_module"
 def render_module_1():
     st.header("🤸‍♂️ Module 1: AI Gym Trainer")
     cam = st.camera_input("Capture Pose")
-    if cam: st.success("Pose data ingested. Analyzing joint angles...")
-
+    
+    # Initialize MediaPipe Pose inside the function or globally
+    mp_pose = mp.solutions.pose
+    
+    if cam is not None:
+        # Convert camera input to image
+        file_bytes = np.asarray(bytearray(cam.read()), dtype=np.uint8)
+        image = cv2.imdecode(file_bytes, 1)
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        
+        with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
+            results = pose.process(image_rgb)
+            
+            if results.pose_landmarks:
+                st.success("Pose data ingested. Analyzing joint angles...")
+                
+                # Extract landmarks (e.g., Shoulder, Elbow, Wrist)
+                landmarks = results.pose_landmarks.landmark
+                shoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x, 
+                            landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
+                elbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x, 
+                         landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
+                wrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x, 
+                         landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
+                
+                # Calculate and display angle
+                angle = calculate_angle(shoulder, elbow, wrist)
+                st.metric("Detected Elbow Angle", f"{int(angle)}°")
+                
+                # Visual Feedback
+                mp.solutions.drawing_utils.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+                st.image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB), caption="Analyzed Pose")
+            else:
+                st.error("No pose detected. Ensure your full body is in the frame.")
 def render_module_2():
     st.header("🥗 Module 2: AI Dietician")
     user_input = st.text_input("Enter fitness goal:", "High protein recovery")
