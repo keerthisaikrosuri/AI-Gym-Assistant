@@ -392,44 +392,47 @@ else:
     
         score = st.session_state.get("performance_score", 82)
     
-        if "chat_history" not in st.session_state:
-            st.session_state["chat_history"] = []
+        
+    if "chat_input" not in st.session_state:
+        st.session_state["chat_input"] = ""
     
-        if "chat_input" not in st.session_state:
+    st.session_state["chat_input"] = st.text_input("Enter message", value=st.session_state["chat_input"])
+    
+    # SEND BUTTON
+    if st.button("Send Chat Message"):
+    
+        user_msg = st.session_state["chat_input"]
+    
+        if user_msg.strip() != "":
+    
+            analysis = sentiment_engine(user_msg)[0]
+            sentiment_label = analysis['label']
+    
+            score = st.session_state.get("performance_score", 82)
+    
+            if sentiment_label == "NEGATIVE" and score < 75:
+                reply = "I noticed your form score is struggling. Don't push for PRs today—let's prioritize mobility."
+            elif sentiment_label == "POSITIVE":
+                reply = "High energy detected! Your score is strong. Let's aim to increase your load by 5% today."
+            else:
+                reply = "Consistency is key. Focus on clean movement patterns."
+    
+            st.session_state["chat_history"].append({
+                "sender": "Athlete",
+                "msg": user_msg,
+                "sentiment": sentiment_label
+            })
+    
+            st.session_state["chat_history"].append({
+                "sender": "Buddy AI",
+                "msg": reply,
+                "sentiment": "NEUTRAL"
+            })
+    
+            # CLEAR INPUT AFTER SENDING
             st.session_state["chat_input"] = ""
     
-        user_msg = st.text_input("Enter message")
-        
-        if st.button("Send Chat Message"):
-        
-            if user_msg and user_msg.strip():
-        
-                analysis = sentiment_engine(user_msg)[0]
-                sentiment_label = analysis['label']
-        
-                score = st.session_state.get("performance_score", 82)
-        
-                if sentiment_label == "NEGATIVE" and score < 75:
-                    reply = "I noticed your form score is struggling. Don't push for PRs today—let's prioritize mobility."
-                elif sentiment_label == "POSITIVE":
-                    reply = "High energy detected! Your score is strong. Let's aim to increase your load by 5% today."
-                else:
-                    reply = "Consistency is key. Focus on clean movement patterns."
-        
-                st.session_state["chat_history"].append({
-                    "sender": "Athlete",
-                    "msg": user_msg,
-                    "sentiment": sentiment_label
-                })
-        
-                st.session_state["chat_history"].append({
-                    "sender": "Buddy AI",
-                    "msg": reply,
-                    "sentiment": "NEUTRAL"
-                })
-        
-                st.rerun()
-    
+            st.rerun()
     # =====================================================
     # MODULE 6: POSE ANALYZER
     # =====================================================
