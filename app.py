@@ -1,11 +1,16 @@
 import streamlit as st
 import numpy as np
-import time
 import cv2
 import mediapipe as mp
+from mediapipe.tasks import python
+from mediapipe.tasks.python import vision
 
-mp_pose = mp.solutions.pose
-mp_drawing = mp.solutions.drawing_utils
+base_options = python.BaseOptions(model_asset_path='pose_landmarker.task')
+options = vision.PoseLandmarkerOptions(
+    base_options=base_options,
+    output_segmentation_masks=True
+)
+landmarker = vision.PoseLandmarker.create_from_options(options)
 
 # 1. HELPER FUNCTIONS 
 def calculate_angle(a, b, c):
@@ -29,11 +34,12 @@ def render_module_1():
     cam = st.camera_input("Capture Pose")
     
     if cam is not None:
+        # Decode and process image
         file_bytes = np.asarray(bytearray(cam.read()), dtype=np.uint8)
         image = cv2.imdecode(file_bytes, 1)
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         
-        # Use the global mp_pose here
+        # Process Pose
         with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
             results = pose.process(image_rgb)
             
@@ -49,12 +55,17 @@ def render_module_1():
                 wrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x, 
                          landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
                 
+                # Calculate angle
                 angle = calculate_angle(shoulder, elbow, wrist)
                 st.metric("Detected Elbow Angle", f"{int(angle)}°")
                 
-                # Drawing
-                mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
-                st.image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+                # Visualization
+                annotated_image = image.copy()
+                mp_drawing.draw_landmarks(annotated_image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+                st.image(cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB), caption="Analyzed Pose", use_container_width=True)
+            
+            else:
+                st.warning("No pose detected. Please ensure your full upper body is visible.")
                 
 def render_module_2():
     st.header("🥗 Module 2: AI Dietician")
