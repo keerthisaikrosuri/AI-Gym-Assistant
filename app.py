@@ -92,12 +92,10 @@ with st.sidebar:
     selection = st.radio(
         "Navigation",
         all_modules,
-        key="nav_radio"
+        index=all_modules.index(st.session_state["selected_module"])
     )
 
-    if selection != st.session_state["selected_module"]:
-        st.session_state["selected_module"] = selection
-        st.rerun()
+    st.session_state["selected_module"] = selection
 
     st.metric("System Uptime", "99.9%")
     st.metric("AI Load", "14%")
