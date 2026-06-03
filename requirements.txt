@@ -2,8 +2,7 @@ streamlit
 numpy
 plotly
 scikit-learn
-mediapipe
-pillow
-opencv-python-headless
 transformers
 sentence-transformers
+torch
+tensorflow
