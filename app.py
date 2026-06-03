@@ -387,6 +387,7 @@ else:
     # =====================================================
     # MODULE 5: Virtual Gym Buddy
     # =====================================================
+    current_exec_module = current_exec_module.strip()
     elif current_exec_module == "Module 5":
         st.markdown("<div class='module-strip'><h2>💬 Module 5: Virtual Gym Buddy (AI Chat Companion)</h2></div>", unsafe_allow_html=True)
     
