@@ -1,17 +1,10 @@
 import streamlit as st
 import numpy as np
 import time
-from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import StandardScaler
-from transformers import pipeline
-from sentence_transformers import SentenceTransformer, util
+import cv2
 import mediapipe as mp
-from PIL import Image
-import cv2 
-
-# GLOBAL INITIALIZATION 
-mp_pose = mp.solutions.pose
-mp_drawing = mp.solutions.drawing_utils
+from mediapipe.python.solutions import pose as mp_pose
+from mediapipe.python.solutions import drawing_utils as mp_drawing
 
 # 1. HELPER FUNCTIONS 
 def calculate_angle(a, b, c):
