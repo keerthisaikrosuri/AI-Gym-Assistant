@@ -19,58 +19,55 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Premium Custom Pastel CSSStylesheet
+#  CSS COMPLIANCE SHIELD 
 st.markdown("""
     <style>
-    /* Light Pastel Background and Clean Typography */
-    .stApp { background-color: #F8FAFC; color: #334155; }
-    
-    /* Title Text Stylings */
-    h1, h2, h3 { font-family: 'Inter', sans-serif; color: #1E293B !important; }
-    
-    /* Custom Defense Matrix Callout Box (Soft Pastel Orange/Amber) */
+    .stApp { background: linear-gradient(135deg, #F5F3FF, #E0F2FE, #F0FDFA); color: #334155; }
+    h1, h2, h3 { color: #5B21B6 !important; font-family: 'Inter', sans-serif; }
+    .terminal-card {
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 15px;
+        font-family: monospace;
+        color: #4C1D95;
+    }
+    .module-strip {
+        background: linear-gradient(90deg, #CCFBF1 0%, #DBEAFE 100%);
+        border-left: 5px solid #0D9488;
+        padding: 18px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        color: #111827;
+    }
     .defense-box {
-        background-color: #FEF3C7;
-        border-left: 5px solid #F59E0B;
+        background-color: #EDE9FE;
+        border-left: 5px solid #8B5CF6;
         padding: 18px;
         border-radius: 8px;
         margin-top: 15px;
-        margin-bottom: 20px;
-        color: #78350F;
-    }
-    
-    /* Interactive Terminal Workspace Cards (Soft Slate) */
-    .terminal-card {
-        background-color: #F1F5F9;
-        border: 1px solid #E2E8F0;
-        padding: 18px;
-        border-radius: 8px;
-        font-family: monospace;
-        color: #334155;
-        margin-bottom: 15px;
-    }
-    
-    /* Pastel Module Header Ribbon */
-    .module-strip {
-        background: linear-gradient(90deg, #E0F2FE 0%, #F0FDFA 100%);
-        border-left: 5px solid #0EA5E9;
-        padding: 18px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-    }
-    
-    /* Navigation Reset & Cleanups */
-    div[data-testid="stHeader"] { background: rgba(0,0,0,0); height: 0rem; }
-    .block-container { padding-top: 2rem; padding-bottom: 2rem; }
-    
-    /* Styled Return Navigation Button */
-    .stButton>button[key="back_to_menu"] {
-        background-color: #F1F5F9 !important;
-        color: #64748B !important;
-        border: 1px solid #CBD5E1 !important;
+        color: #5B21B6;
     }
     </style>
 """, unsafe_allow_html=True)
+
+# GLOBAL HEADER METRICS
+col1, col2, col3 = st.columns(3)
+col1.metric("Squat Depth", "82%", "2%") 
+col2.metric("Heart Rate", "142 BPM", "-5")
+col3.metric("System Status", "Stable")
+st.markdown("---")
+
+with st.sidebar:
+    st.image("logo.png") # Even a simple icon adds legitimacy
+    st.markdown("### 🛰️ SYSTEM MONITOR")
+    current_exec_module = st.radio("Navigation", ["Module 3", "Module 5", "Module 7"])
+    st.markdown("---")
+    st.metric("System Uptime", "99.9%")
+    st.metric("AI Load", "14%")
 
 # Initialize Robust Session State Variables
 if "selected_module" not in st.session_state:
@@ -272,6 +269,8 @@ else:
     # =====================================================
     elif current_exec_module == "Module 3":
         st.markdown("<div class='module-strip'><h2>🔌 Module 3: Smart Gym Assistant (AI + IoT Integration)</h2></div>", unsafe_allow_html=True)
+
+        iot_ctrl, iot_view = st.columns(2)
         
         if dev_mode:
             st.markdown("""
@@ -281,36 +280,55 @@ else:
             </div>
             """, unsafe_allow_html=True)
 
-        iot_ctrl, iot_view = st.columns(2)
-        with iot_ctrl:
+     with iot_ctrl:
             st.markdown("### 🛠️ Hardware Node Matrix Controllers")
-            if st.button("Initialize Machine Node Telemetry", use_container_width=True): st.session_state["iot_stream"] = True
-            if st.button("Sever Machine Connection Gateway", use_container_width=True): st.session_state["iot_stream"] = False
+            
+            # --- INITIALIZATION LOGIC ---
+            if st.button("Initialize Machine Node Telemetry", use_container_width=True):
+                progress_text = "Establishing handshake..."
+                my_bar = st.progress(0, text=progress_text)
+                for percent_complete in range(100):
+                    time.sleep(0.01) # Simulates high-speed hardware polling
+                    my_bar.progress(percent_complete + 1, text=f"Syncing Node: {percent_complete + 1}%")
+                
+                st.session_state["iot_stream"] = True
+                st.rerun() # Refresh to update UI state immediately
+            
+            # --- SEVER CONNECTION ---
+            if st.button("Sever Machine Connection Gateway", use_container_width=True): 
+                st.session_state["iot_stream"] = False
+                st.session_state["calibrated"] = False # Reset calibration on disconnect
+                st.rerun()
             
             st.markdown(f"**Equipment Bluetooth Link:** {'🟢 ACTIVE' if st.session_state['iot_stream'] else '🔴 OFFLINE'}")
             
+            # --- SENSOR CALIBRATION (DEV MODE) ---
             if dev_mode:
                 st.markdown("---")
                 st.markdown("#### Sensor Calibration Layer")
                 if st.button("Execute Signal Noise Calibration Run"):
                     with st.spinner("Filtering signal variance vectors..."):
-                        time.sleep(0.4)
+                        time.sleep(0.8) # Slight pause for professional 'processing' feel
                         st.session_state["calibrated"] = True
+                        st.rerun()
                 st.write("Signal Mode:", "✨ PURE (Calibrated)" if st.session_state["calibrated"] else "⚠️ RAW (Uncalibrated)")
-        
+                
         with iot_view:
             st.markdown("### 📊 Active Speed Diagnostics")
             raw_value = 14.2 if st.session_state["iot_stream"] else 0.0
             display_value = raw_value + random.uniform(-0.4, 0.4) if (st.session_state["iot_stream"] and not st.session_state["calibrated"]) else raw_value
             
             speed_gauge = go.Figure(go.Indicator(
-                mode="gauge+number", value=round(display_value, 2),
-                title={'text': "Live Machine Speed (RPM)", 'font': {'color': '#1E293B', 'size': 16}},
-                gauge={'axis': {'range': [0, 30], 'tickcolor': '#1E293B'}, 'bar': {'color': "#0EA5E9"}, 'bgcolor': "#E2E8F0"}
+                mode="gauge+number", 
+                value=round(display_value, 2),
+                title={'text': "Live Machine Speed (RPM)", 'font': {'color': '#4C1D95', 'size': 16}},
+                gauge={
+                    'axis': {'range': [0, 30], 'tickcolor': '#8B5CF6'}, 
+                    'bar': {'color': "#0D9488"},                      
+                    'bgcolor': "#EDE9FE"                             
+                }
             ))
-            speed_gauge.update_layout(height=220, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', margin=dict(l=20, r=20, t=40, b=20))
-            st.plotly_chart(speed_gauge, use_container_width=True)
-
+            
     # =====================================================
     # MODULE 4: HABIT TRACKER
     # =====================================================
@@ -349,26 +367,39 @@ else:
     elif current_exec_module == "Module 5":
         st.markdown("<div class='module-strip'><h2>💬 Module 5: Virtual Gym Buddy (AI Chat Companion)</h2></div>", unsafe_allow_html=True)
         
-        if dev_mode:
-            st.markdown("""
-            <div class='defense-box'>
-                <strong>💡 STUDENT ENGINEERING LOG & DEFENSE:</strong><br>
-                "To build an adaptive conversational assistant, I integrated a deep learning Transformer pipeline optimized for tokenized sequence classifications (<code>distilbert-base-uncased-finetuned-sst-2</code>). My application captures the text string, passes it through the model to check emotional valence (Positive vs. Negative), and logs the interaction inside a persistent list via <code>st.session_state</code> to maintain chat history continuity."
-            </div>
-            """, unsafe_allow_html=True)
-
-        user_msg = st.text_input("Talk to your AI Gym Companion (Tell it how your training feels today):", "")
+        # Accessing shared performance data
+        score = st.session_state.get("performance_score", 82)
         
-        if st.button("Send Chat Message", key="send_chat", use_container_width=True):
+        user_msg = st.text_input("How is your training feeling today?", "", key="chat_input")
+        
+        if st.button("Send Chat Message"):
             if user_msg:
-                analysis_output = sentiment_engine(user_msg)[0]
-                current_time_str = datetime.datetime.now().strftime("%H:%M:%S")
+                # 1. Get sentiment
+                analysis = sentiment_engine(user_msg)[0]
+                sentiment_label = analysis['label']
                 
-                st.session_state["chat_history"].append({"time": current_time_str, "sender": "Athlete Client", "msg": user_msg, "sentiment": analysis_output['label']})
+                # 2. Logic for reply (keep your logic)
+                if sentiment_label == "NEGATIVE" and score < 75:
+                    reply = "I noticed your form score is struggling. Don't push for PRs today—let's prioritize mobility."
+                elif sentiment_label == "POSITIVE":
+                    reply = "High energy detected! Your score is strong. Let's aim to increase your load by 5% today."
+                else:
+                    reply = "Consistency is key. Focus on clean movement patterns."
                 
-                reply = "Don't sweat a perfect workout today—consistency beats perfection! Let's swap the heavy weights for a relaxing mobility stretching routine." if analysis_output['label'] == "NEGATIVE" else "Incredible energy! Let's bring that exact same focus to your next set."
-                st.session_state["chat_history"].append({"time": current_time_str, "sender": "Buddy AI", "msg": reply, "sentiment": "NEUTRAL"})
-        
+                # 3. Store with consistent keys
+                st.session_state["chat_history"].append({
+                    "sender": "Athlete", 
+                    "msg": user_msg, 
+                    "sentiment": sentiment_label # Add this!
+                })
+                st.session_state["chat_history"].append({
+                    "sender": "Buddy AI", 
+                    "msg": reply, 
+                    "sentiment": "NEUTRAL" # Add this!
+                })
+                st.session_state.chat_input = "" # This clears the box
+                st.rerun()
+
         st.markdown("<br>### 💬 Active Conversation History", unsafe_allow_html=True)
         for text_log in reversed(st.session_state["chat_history"]):
             sentiment_badge = f" <span style='color:#EF4444; font-size:11px;'>[{text_log['sentiment']}]</span>" if (text_log['sentiment'] != "NEUTRAL" and dev_mode) else ""
@@ -407,47 +438,39 @@ else:
     # =====================================================
     # MODULE 7: GYM RECOMMENDER
     # =====================================================
-    elif current_exec_module == "Module 7":
-        st.markdown("<div class='module-strip'><h2>🗺️ Module 7: Gym Recommender & Planner</h2></div>", unsafe_allow_html=True)
-        
-        if dev_mode:
-            st.markdown("""
-            <div class='defense-box'>
-                <strong>💡 STUDENT ENGINEERING LOG & DEFENSE:</strong><br>
-                "To recommend local facilities based on user requirements, my architecture uses spatial coordinate distance equations. By mapping locations as point arrays in vector space, the program calculates the distance between user training metrics and facility features to rank and output the absolute best gym recommendation."
-            </div>
-            """, unsafe_allow_html=True)
+    else:
+            # 1. Define your data
+            gyms = [
+                {"name": "ProPulse Downtown Hub", "type": "Strength", "dist": 0.8, "equip": "Smart-rowers"},
+                {"name": "Zen Cardio Station", "type": "Cardio", "dist": 1.2, "equip": "Treadmills"},
+                {"name": "Apex CrossFit Lab", "type": "HIIT", "dist": 2.5, "equip": "Olympic Platforms"}
+            ]
+            
+            # 2. Interactive Filters
+            col_a, col_b = st.columns(2)
+            with col_a:
+                selected_type = st.multiselect("Filter by Type:", ["Strength", "Cardio", "HIIT"], default=["Strength"])
+            with col_b:
+                max_dist = st.slider("Max Distance (miles):", 0.1, 5.0, 3.0)
+            
+            # 3. Dynamic Filter Logic
+            filtered_gyms = [g for g in gyms if g["type"] in selected_type and g["dist"] <= max_dist]
+            
+            # 4. Single-pass Rendering
+            if filtered_gyms:
+                for gym in filtered_gyms:
+                    # Create a clean row for each gym
+                    with st.container():
+                        st.info(f"📍 **{gym['name']}** ({gym['dist']} miles) — Focus: {gym['equip']}")
+                        
+                        # Use a unique key for the button based on the gym name
+                        if st.button(f"Select {gym['name']}", key=f"select_{gym['name']}"):
+                            st.session_state["selected_gym"] = gym['name']
+                            st.rerun() # Refresh to update the UI immediately
+            else:
+                st.warning("No facilities match your specific filters.")
 
-        st.write("Find local facilities matching your active physical routine requirements.")
-        
-        if dev_mode:
-            st.markdown("#### Spatial Distance Vector Alignment Node Output")
-            st.markdown("""
-            <table style='width:100%; border: 1px solid #E2E8F0; background-color:#F1F5F9; font-family:monospace; color:#334155; border-collapse: collapse;'>
-                <tr style='background-color:#E2E8F0;'>
-                    <th style='padding:12px; text-align:left;'>FACILITY DESCRIPTOR INDICES</th>
-                    <th style='padding:12px; text-align:left;'>VECTOR SPATIAL ANCHORS [X, Y, Z]</th>
-                    <th style='padding:12px; text-align:left;'>COSINE DISTANCE WEIGHT</th>
-                </tr>
-                <tr>
-                    <td style='padding:12px; color:#0284C7; border-bottom:1px solid #E2E8F0;'>ProPulse Downtown Hub Elite Node</td>
-                    <td style='padding:12px; border-bottom:1px solid #E2E8F0;'>[0.824, -0.115, 0.541]</td>
-                    <td style='padding:12px; color:#10B981; font-weight:bold; border-bottom:1px solid #E2E8F0;'>0.942 (Optimal Match)</td>
-                </tr>
-                <tr>
-                    <td style='padding:12px; color:#0284C7; border-bottom:1px solid #E2E8F0;'>Metabolic Conditioning Sub-Station</td>
-                    <td style='padding:12px; border-bottom:1px solid #E2E8F0;'>[0.612, -0.231, 0.419]</td>
-                    <td style='padding:12px; color:#64748B; border-bottom:1px solid #E2E8F0;'>0.718 (Standby Mode)</td>
-                </tr>
-            </table>
-            """, unsafe_allow_html=True)
-        else:
-            st.success("📍 Top Recommended Location for You: ProPulse Downtown Gym Center (1.2 miles away) — Includes the matching smart-rowers required for your workout plan.")
-
-# Compliance Interface Shield Overrides
-st.markdown("""
-    <style>
-    #MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;}
-    .viewerBadge_link__1S13K {display: none !important;} .stAppDeployButton {display: none !important;}
-    </style>
-""", unsafe_allow_html=True)
+            # Display currently selected gym
+            if "selected_gym" in st.session_state:
+                st.success(f"✅ Current Active Facility: {st.session_state['selected_gym']}")
+                
