@@ -328,6 +328,8 @@ else:
                     'bgcolor': "#EDE9FE"                             
                 }
             ))
+
+            st.plotly_chart(speed_gauge, use_container_width=True)
             
     # =====================================================
     # MODULE 4: HABIT TRACKER
