@@ -280,7 +280,7 @@ else:
             </div>
             """, unsafe_allow_html=True)
 
-     with iot_ctrl:
+         with iot_ctrl:
             st.markdown("### 🛠️ Hardware Node Matrix Controllers")
             
             # --- INITIALIZATION LOGIC ---
@@ -313,7 +313,7 @@ else:
                         st.rerun()
                 st.write("Signal Mode:", "✨ PURE (Calibrated)" if st.session_state["calibrated"] else "⚠️ RAW (Uncalibrated)")
                 
-        with iot_view:
+            with iot_view:
             st.markdown("### 📊 Active Speed Diagnostics")
             raw_value = 14.2 if st.session_state["iot_stream"] else 0.0
             display_value = raw_value + random.uniform(-0.4, 0.4) if (st.session_state["iot_stream"] and not st.session_state["calibrated"]) else raw_value
