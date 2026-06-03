@@ -66,7 +66,7 @@ with st.sidebar:
     st.markdown("### 🛰️ SYSTEM MONITOR")
     
     # Use the full list so your app feels complete for the judges
-    all_modules = ["Home", "Module 1", "Module 2", "Module 3", "Module 4", "Module 5", "Module 6", "Module 7"]
+    all_modules = ["Menu", "Module 1", "Module 2", "Module 3", "Module 4", "Module 5", "Module 6", "Module 7"]
     
     # This stores the selection in session_state, which is the "right" way for Streamlit apps
     selected = st.radio("Navigation", all_modules)
