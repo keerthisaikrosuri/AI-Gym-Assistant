@@ -61,7 +61,7 @@ col2.metric("Heart Rate", "142 BPM", "-5")
 col3.metric("System Status", "Stable")
 st.markdown("---")
 
-   with st.sidebar:
+with st.sidebar:
     # Navigation
     st.markdown("### 🛰️ SYSTEM MONITOR")
     
