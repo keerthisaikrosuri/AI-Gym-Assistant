@@ -95,7 +95,8 @@ if "chat_history" not in st.session_state:
 @st.cache_resource
 def load_deep_learning_assets():
     scaler = StandardScaler()
-    dummy_x = np.array([[30, 0.1, 2], [2, 2.5, 9], [15, 0.5, 4], [1, 3.0, 8], [25, 0.2, 3]])
+    # Features: [Attendance Streak, Fatigue Index]
+    dummy_x = np.array([[30, 2.0], [2, 9.0], [15, 4.0], [1, 8.0], [25, 3.0]])
     dummy_y = np.array([0, 1, 0, 1, 0])
     scaler.fit(dummy_x)
     habit_classifier = LogisticRegression().fit(scaler.transform(dummy_x), dummy_y)
@@ -205,7 +206,7 @@ else:
                     
                     if joint_flexion_degree < 90.0:
                         st.markdown("<p style='color: #EF4444; font-weight:700;'>⚠️ STATUS: SHALLOW POSITION RECOGNIZED</p>", unsafe_allow_html=True)
-                        st.write("Your stance is too shallow. Drive your hips lower to hit a perfect 90-degree squad form.")
+                        st.write("Your stance is too shallow. Drive your hips lower to hit a perfect 90-degree squat form.")
                     else:
                         st.markdown("<p style='color: #10B981; font-weight:700;'>✅ STATUS: STANDARD DEPTH VALIDATED</p>", unsafe_allow_html=True)
                         st.write("Perfect movement execution! Your body alignment looks excellent.")
@@ -230,7 +231,14 @@ else:
                     with st.spinner("Searching nutrition databases..."):
                         query_vector = embedder.encode(user_diet_prompt, convert_to_tensor=True)
                         hits = util.semantic_search(query_vector, nutrition_embeddings, top_k=1)[0][0]
-                        st.session_state["grocery_list"] = ["Organic Protein Powder", "Steamed Broccoli", "Wild Caught Salmon Fillets", "Brown Rice Compounds"]
+                        
+                        # Dynamically alter grocery list responses based on semantic match context index
+                        if hits['corpus_id'] == 0:
+                            st.session_state["grocery_list"] = ["Lean Chicken Breast", "Organic Broccoli", "Brown Rice Flakes"]
+                        elif hits['corpus_id'] == 1:
+                            st.session_state["grocery_list"] = ["Wild Salmon Fillets", "Fresh Avocados", "Soft Boiled Eggs"]
+                        else:
+                            st.session_state["grocery_list"] = ["Quinoa Bases", "Organic Kale Greens", "Vitamin Complex Shakes"]
                         
                         if dev_mode:
                             st.info(f"🧬 **NLP Embedding Vector Distance Match Score:** `{round(hits['score']*100, 2)}%` accuracy matching your raw input string text.")
@@ -306,7 +314,8 @@ else:
                 with h_col1: user_attendance_streak = st.slider("How many days in a row have you worked out?", 1, 30, 14)
                 with h_col2: user_fatigue_index = st.slider("How tired do you feel today? (Scale 1-10)", 1.0, 10.0, 4.2)
                 
-                input_features = scaler.transform(np.array([[user_attendance_streak, 0.4, user_fatigue_index]]))
+                # Fixed input feature sizing to perfectly match trained matrix layout
+                input_features = scaler.transform(np.array([[user_attendance_streak, user_fatigue_index]]))
                 lapse_risk = habit_classifier.predict_proba(input_features)[0][1]
                 
                 if dev_mode:
