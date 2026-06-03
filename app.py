@@ -62,7 +62,16 @@ col3.metric("System Status", "Stable")
 st.markdown("---")
 
 with st.sidebar:
-    st.image("logo.png") # Even a simple icon adds legitimacy
+    st.markdown("""
+        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#5B21B6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20M2 12h20M12 2a10 10 0 0 1 10 10M12 2a10 10 0 0 0-10 10M12 22a10 10 0 0 1-10-10M12 22a10 10 0 0 0 10-10"/>
+                <circle cx="12" cy="12" r="3" fill="#5B21B6"/>
+            </svg>
+        </div>
+        <h2 style="text-align: center; color: #4C1D95;">PROPULSE</h2>
+    """, unsafe_allow_html=True)
+    
     st.markdown("### 🛰️ SYSTEM MONITOR")
     current_exec_module = st.radio("Navigation", ["Module 3", "Module 5", "Module 7"])
     st.markdown("---")
