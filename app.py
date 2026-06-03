@@ -8,13 +8,23 @@ from sentence_transformers import SentenceTransformer, util
 import mediapipe as mp
 from PIL import Image
 
-# 1. Page Config
+# 1. HELPER FUNCTIONS 
+def calculate_angle(a, b, c):
+    """Calculates the angle between three points."""
+    a = np.array(a)
+    b = np.array(b)
+    c = np.array(c)
+    radians = np.arctan2(c[1]-b[1], c[0]-b[0]) - np.arctan2(a[1]-b[1], a[0]-b[0])
+    angle = np.abs(radians*180.0/np.pi)
+    return angle if angle <= 180 else 360 - angle
+    
+# 2. Page Config
 st.set_page_config(page_title="ProPulse Command Center", layout="wide")
 
-# 2. Initialization
+# 3. Initialization
 if "selected_module" not in st.session_state: st.session_state["selected_module"] = "Menu"
 
-# 3. Module Logic Definitions
+# 4. Module Logic Definitions
 def render_module_1():
     st.header("🤸‍♂️ Module 1: AI Gym Trainer")
     cam = st.camera_input("Capture Pose")
@@ -52,7 +62,7 @@ def render_module_7():
     st.header("🗺️ Module 7: Gym Recommender")
     st.info("Mapping spatial distance vectors... Found: ProPulse Elite (1.2 miles)")
 
-# 4. Routing Table
+# 5. Routing Table
 module_map = {
     "Module 1": render_module_1,
     "Module 2": render_module_2,
@@ -63,7 +73,7 @@ module_map = {
     "Module 7": render_module_7,
 }
 
-# 5. Main Control Flow
+# 6. Main Control Flow
 if st.session_state["selected_module"] == "Menu":
     st.title("⚡ ATHLETIC OPERATIONAL HUB")
     cols = st.columns(3)
