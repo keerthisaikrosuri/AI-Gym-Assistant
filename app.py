@@ -88,8 +88,7 @@ with st.sidebar:
     #"Navigation",
     #all_modules,
     #index=current_idx,
-    #key="nav_radio"
-)
+    #key="nav_radio" )
 
 if selection != st.session_state["selected_module"]:
     st.session_state["selected_module"] = selection
