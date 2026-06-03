@@ -387,7 +387,10 @@ else:
             st.success("✅ AI Coach Advice: Metrics reflect highly robust habit compliance trends. Keep pushing your training goals!")
 
     # =====================================================
-    elif current_exec_module == "Module 5":
+    # MODULE 5:  Virtual Gym Buddy 
+    # =====================================================
+  
+elif current_exec_module == "Module 5":
     st.markdown("<div class='module-strip'><h2>💬 Module 5: Virtual Gym Buddy (AI Chat Companion)</h2></div>", unsafe_allow_html=True)
 
     # Shared performance score
@@ -453,6 +456,7 @@ else:
             <strong style='color:{label_color};'>{text_log['sender']}:</strong> {text_log['msg']}{sentiment_badge}
         </div>
         """, unsafe_allow_html=True)
+
 
     # =====================================================
     # MODULE 6: POSE ANALYZER
