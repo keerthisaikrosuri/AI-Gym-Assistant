@@ -61,20 +61,22 @@ col2.metric("Heart Rate", "142 BPM", "-5")
 col3.metric("System Status", "Stable")
 st.markdown("---")
 
-with st.sidebar:
-    st.markdown("""
-        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#5B21B6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2v20M2 12h20M12 2a10 10 0 0 1 10 10M12 2a10 10 0 0 0-10 10M12 22a10 10 0 0 1-10-10M12 22a10 10 0 0 0 10-10"/>
-                <circle cx="12" cy="12" r="3" fill="#5B21B6"/>
-            </svg>
-        </div>
-        <h2 style="text-align: center; color: #4C1D95;">PROPULSE</h2>
-    """, unsafe_allow_html=True)
-    
+   with st.sidebar:
+    # Navigation
     st.markdown("### 🛰️ SYSTEM MONITOR")
-    current_exec_module = st.radio("Navigation", ["Module 3", "Module 5", "Module 7"])
+    
+    # Use the full list so your app feels complete for the judges
+    all_modules = ["Menu", "Module 1", "Module 2", "Module 3", "Module 4", "Module 5", "Module 6", "Module 7"]
+    
+    # This stores the selection in session_state, which is the "right" way for Streamlit apps
+    selected = st.radio("Navigation", all_modules)
+    
+    # Update the global state so the rest of your app knows what to show
+    st.session_state["selected_module"] = selected
+    
     st.markdown("---")
+    
+    # Metrics
     st.metric("System Uptime", "99.9%")
     st.metric("AI Load", "14%")
 
