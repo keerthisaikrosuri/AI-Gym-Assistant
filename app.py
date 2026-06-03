@@ -359,81 +359,83 @@ else:
     # =====================================================
     elif current_exec_module == "Module 4":
         st.markdown("<div class='module-strip'><h2>📈 Module 4: AI Fitness Habit Tracker (Behavioral AI)</h2></div>", unsafe_allow_html=True)
-        
+    
         if dev_mode:
-            st.markdown("""
-            <div class='defense-box'>
-                <strong>💡 STUDENT ENGINEERING LOG & DEFENSE:</strong><br>
-                "This block runs a classical Machine Learning classification model from scratch. I used <code>scikit-learn</code>'s <code>StandardScaler</code> to normalize numerical input features in real-time, preventing high-magnitude values (like streaks) from skewing weight distributions. The predictive engine runs a supervised <code>LogisticRegression</code> model inside my server script memory, evaluating the probability vector <code>predict_proba</code> to compute exact schedule risk bounds."
-            </div>
-            """, unsafe_allow_html=True)
-
-        st.write("This panel executes predictive data science models to map structural workout dropout risks based on routine fatigue parameters.")
-        
+            st.markdown("""<div class='defense-box'>...</div>""", unsafe_allow_html=True)
+    
+        st.write("This panel executes predictive data science models...")
+    
         h_col1, h_col2 = st.columns(2)
-        with h_col1: user_attendance_streak = st.slider("Current Workout Consistency Streak (Days)", 1, 30, 14)
-        with h_col2: user_fatigue_index = st.slider("Perceived Physical Fatigue Scale (1.0 - 10.0)", 1.0, 10.0, 4.2)
-        
+        with h_col1:
+            user_attendance_streak = st.slider("Current Workout Consistency Streak (Days)", 1, 30, 14)
+        with h_col2:
+            user_fatigue_index = st.slider("Perceived Physical Fatigue Scale (1.0 - 10.0)", 1.0, 10.0, 4.2)
+    
         input_features = scaler.transform(np.array([[user_attendance_streak, user_fatigue_index]]))
         lapse_risk = habit_classifier.predict_proba(input_features)[0][1]
-        
+    
         st.markdown("---")
         risk_percentage = round(lapse_risk * 100, 0)
         st.metric("Estimated Workout Skip Risk Status", f"{risk_percentage}% Risk Factor")
-        
+    
         if risk_percentage > 50:
-            st.warning("⚠️ AI Coach Advice: Your fatigue levels are statistically elevated relative to your habit streak. Consider managing fatigue indices downward with a deliberate low-intensity dynamic alignment recovery sequence today.")
+            st.warning("⚠️ AI Coach Advice: Your fatigue levels are elevated...")
         else:
-            st.success("✅ AI Coach Advice: Metrics reflect highly robust habit compliance trends. Keep pushing your training goals!")
-
+            st.success("✅ AI Coach Advice: Metrics are strong...")
+    
+    
     # =====================================================
-    # MODULE 5:  Virtual Gym Buddy 
+    # MODULE 5: Virtual Gym Buddy
     # =====================================================
-elif current_exec_module == "Module 5":
-    st.markdown("<div class='module-strip'><h2>💬 Module 5: Virtual Gym Buddy (AI Chat Companion)</h2></div>", unsafe_allow_html=True)
-
-    score = st.session_state.get("performance_score", 82)
-
-    if "chat_history" not in st.session_state:
-        st.session_state["chat_history"] = []
-
-    if "chat_input" not in st.session_state:
-        st.session_state["chat_input"] = ""
-
-    user_msg = st.text_input("Enter message", key="chat_input")
-
-    if st.button("Send Chat Message"):
-        if user_msg:
-
-            analysis = sentiment_engine(user_msg)[0]
-            sentiment_label = analysis['label']
-
-            if sentiment_label == "NEGATIVE" and score < 75:
-                reply = "I noticed your form score is struggling. Don't push for PRs today—let's prioritize mobility."
-            elif sentiment_label == "POSITIVE":
-                reply = "High energy detected! Your score is strong. Let's aim to increase your load by 5% today."
-            else:
-                reply = "Consistency is key. Focus on clean movement patterns."
-
-            st.session_state["chat_history"].append({
-                "sender": "Athlete",
-                "msg": user_msg,
-                "sentiment": sentiment_label
-            })
-
-            st.session_state["chat_history"].append({
-                "sender": "Buddy AI",
-                "msg": reply,
-                "sentiment": "NEUTRAL"
-            })
-
+    elif current_exec_module == "Module 5":
+        st.markdown("<div class='module-strip'><h2>💬 Module 5: Virtual Gym Buddy (AI Chat Companion)</h2></div>", unsafe_allow_html=True)
+    
+        score = st.session_state.get("performance_score", 82)
+    
+        if "chat_history" not in st.session_state:
+            st.session_state["chat_history"] = []
+    
+        if "chat_input" not in st.session_state:
             st.session_state["chat_input"] = ""
-            st.rerun()
+    
+        user_msg = st.text_input("Enter message", key="chat_input")
+    
+        if st.button("Send Chat Message"):
+            if user_msg:
+    
+                analysis = sentiment_engine(user_msg)[0]
+                sentiment_label = analysis['label']
+    
+                if sentiment_label == "NEGATIVE" and score < 75:
+                    reply = "I noticed your form score is struggling..."
+                elif sentiment_label == "POSITIVE":
+                    reply = "High energy detected!"
+                else:
+                    reply = "Consistency is key."
+    
+                st.session_state["chat_history"].append({
+                    "sender": "Athlete",
+                    "msg": user_msg,
+                    "sentiment": sentiment_label
+                })
+    
+                st.session_state["chat_history"].append({
+                    "sender": "Buddy AI",
+                    "msg": reply,
+                    "sentiment": "NEUTRAL"
+                })
+    
+                st.session_state["chat_input"] = ""
+                st.rerun()
+    
+    
+    # =====================================================
+    # FINAL ELSE (MUST BE LAST)
+    # =====================================================
+    else:
+        st.warning("Invalid module selected")
 
-# ❗ ONLY AFTER ALL ELIFs
-else:
-    st.warning("Invalid module selected")
-
+    
     # =====================================================
     # MODULE 6: POSE ANALYZER
     # =====================================================
